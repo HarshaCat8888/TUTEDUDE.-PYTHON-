@@ -1,0 +1,66 @@
+# ok
+import tkinter as tk
+from tkinter import messagebox
+
+# Function to evaluate the expression
+def calculate():
+    try:
+        result = eval(entry.get())
+        result_label.config(text="Result: " + str(result))
+    except Exception as e:
+        messagebox.showerror("Error", "Invalid Expression")
+        result_label.config(text="Result: ")
+
+# Function to update entry field
+def press(key):
+    entry.insert(tk.END, key)
+
+# Function to clear the entry field
+def clear():
+    entry.delete(0, tk.END)
+    result_label.config(text="Result: ")
+
+# Create main window
+root = tk.Tk()
+root.title("Simple Calculator")
+root.geometry("300x400")
+root.resizable(False, False)
+
+# Entry field
+entry = tk.Entry(root, font=("Arial", 18), bd=5, relief=tk.RIDGE, justify="right")
+entry.pack(pady=10, padx=10, fill=tk.X)
+
+# Result label
+result_label = tk.Label(root, text="Result: ", font=("Arial", 14))
+result_label.pack(pady=5)
+
+# Button layout
+buttons_frame = tk.Frame(root)
+buttons_frame.pack()
+
+buttons = [
+    ('7', '8', '9', '/'),
+    ('4', '5', '6', '*'),
+    ('1', '2', '3', '-'),
+    ('0', '.', '=', '+')
+]
+
+for row in buttons:
+    row_frame = tk.Frame(buttons_frame)
+    row_frame.pack(expand=True, fill='both')
+    for char in row:
+        btn = tk.Button(row_frame, text=char, font=("Arial", 16), width=5, height=2,
+                        command=lambda ch=char: calculate() if ch == '=' else press(ch))
+        btn.pack(side='left', expand=True, fill='both')
+
+# Clear button
+clear_btn = tk.Button(root, text="Clear", font=("Arial", 14), bg="red", fg="white", command=clear)
+clear_btn.pack(pady=10, padx=10, fill=tk.X)
+
+# Start the GUI event loop
+root.mainloop()
+
+
+
+
+
