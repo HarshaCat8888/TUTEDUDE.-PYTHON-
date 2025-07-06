@@ -13,3 +13,21 @@ num = int(input("Enter a number: "))
 # Call the function and display the result
 fact = factorial(num)
 print(f"Factorial of {num} is {fact}")
+
+
+# Task 2: Using the Math Module for Calculations
+
+import math
+
+# Ask the user for a number
+num = float(input("Enter a number: "))
+
+# Calculate using math module
+square_root = math.sqrt(num)
+logarithmic = math.log(num)   # Natural logarithm (base e)
+sine = math.sin(num)          # Input is in radians
+
+# Display the results
+print(f"Square root: {square_root}")
+print(f"Logarithmic: {logarithmic}")
+print(f"Sine: {sine}")
