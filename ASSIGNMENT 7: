@@ -1,0 +1,145 @@
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
+# 🛠️ Step 1: Ensure 'testdb' exists by connecting to the 'postgres' default DB
+def ensure_database_exists():
+    try:
+        conn = psycopg2.connect(
+            dbname="postgres",
+            user="postgres",
+            password="yourpassword",  # Replace with your actual password
+            host="localhost",
+            port="5432"
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1 FROM pg_database WHERE datname = 'testdb'")
+        exists = cursor.fetchone()
+        if not exists:
+            cursor.execute("CREATE DATABASE testdb")
+            print("✅ Database 'testdb' created.")
+        else:
+            print("📦 Database 'testdb' already exists.")
+    except Exception as e:
+        print("❌ Error ensuring database exists:", e)
+    finally:
+        if 'cursor' in locals(): cursor.close()
+        if 'conn' in locals(): conn.close()
+
+# 🎯 Connection parameters for 'testdb'
+DB_PARAMS = {
+    "dbname": "testdb",
+    "user": "postgres",
+    "password": "yourpassword",  # Replace with your password
+    "host": "localhost",
+    "port": "5432"
+}
+
+def connect_db():
+    try:
+        conn = psycopg2.connect(**DB_PARAMS)
+        print("✅ Connected to 'testdb' successfully!")
+        return conn
+    except Exception as e:
+        print("❌ Connection failed:", e)
+        return None
+
+# 1️⃣ Create Table
+def create_table():
+    conn = connect_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS students (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(100),
+                    age INT
+                );
+            """)
+            conn.commit()
+            print("✅ Table 'students' created.")
+        except Exception as e:
+            print("❌ Failed to create table:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+# 2️⃣ Insert Record
+def insert_record(name, age):
+    conn = connect_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO students (name, age) VALUES (%s, %s)
+            """, (name, age))
+            conn.commit()
+            print("✅ Record inserted.")
+        except Exception as e:
+            print("❌ Failed to insert record:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+# 3️⃣ Read Records
+def read_records():
+    conn = connect_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM students")
+            rows = cursor.fetchall()
+            print("📋 Student Records:")
+            for row in rows:
+                print(row)
+        except Exception as e:
+            print("❌ Failed to fetch records:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+# 4️⃣ Update Record
+def update_age(name, new_age):
+    conn = connect_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE students SET age = %s WHERE name = %s
+            """, (new_age, name))
+            conn.commit()
+            print("✅ Record updated.")
+        except Exception as e:
+            print("❌ Failed to update record:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+# 5️⃣ Delete Record
+def delete_record(name):
+    conn = connect_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                DELETE FROM students WHERE name = %s
+            """, (name,))
+            conn.commit()
+            print("🗑️ Record deleted.")
+        except Exception as e:
+            print("❌ Failed to delete record:", e)
+        finally:
+            cursor.close()
+            conn.close()
+
+# 🚀 Run all operations
+if __name__ == "__main__":
+    ensure_database_exists()
+    create_table()
+    insert_record("Alice", 21)
+    read_records()
+    update_age("Alice", 22)
+    read_records()
+    delete_record("Alice")
+    read_records()
